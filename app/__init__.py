@@ -29,8 +29,12 @@ def create_app(config_path=None):
     config = load_config(config_path)
     configure_app(app, config)
     
-    # Configurazione CORS per permettere richieste dal frontend
-    CORS(app, origins=["http://localhost:3000", "http://localhost:5173", "http://127.0.0.1:3000", "http://127.0.0.1:5173"])
+    # Configurazione CORS per deployment web
+    CORS(app, 
+         origins=['*'],  # Permette tutti i domini per deployment
+         methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+         allow_headers=['Content-Type', 'Authorization', 'X-Requested-With'],
+         supports_credentials=True)
     
     # Configurazione logging
     setup_logging(config.get('logging', {}))
@@ -48,11 +52,19 @@ def create_app(config_path=None):
         app.search_controller = None
     
     # Registrazione blueprint API
-    app.register_blueprint(api_bp)
+    app.register_blueprint(api_bp, url_prefix='/api/v1')
     
-    # Route di base
-    @app.route('/')
-    def index():
+    # Registrazione blueprint per servire frontend statico
+    try:
+        from app.static_routes import static_bp
+        app.register_blueprint(static_bp)
+        logging.info("Static routes registrate per servire frontend")
+    except Exception as e:
+        logging.error(f"Errore registrazione static routes: {e}")
+    
+    # Route API di base (solo per /api endpoint)
+    @app.route('/api')
+    def api_info():
         return {
             'message': 'Deep Search AI API',
             'version': '1.0.0',
@@ -96,17 +108,33 @@ def create_app(config_path=None):
     return app
 
 def configure_app(app, config):
-    """Configura l'applicazione Flask"""
+    """Configura l'applicazione Flask per deployment cloud"""
     
     flask_config = config.get('flask', {})
     
-    # Configurazioni Flask base
+    # Configurazioni Flask base con supporto variabili d'ambiente
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', flask_config.get('secret_key', 'dev-secret-key-change-in-production'))
     app.config['DEBUG'] = os.getenv('FLASK_DEBUG', str(flask_config.get('debug', False))).lower() == 'true'
-    app.config['MAX_CONTENT_LENGTH'] = flask_config.get('max_content_length', 50 * 1024 * 1024)  # 50MB default
+    app.config['MAX_CONTENT_LENGTH'] = int(os.getenv('MAX_CONTENT_LENGTH', flask_config.get('max_content_length', 50 * 1024 * 1024)))
+    
+    # Configurazioni per deployment cloud
+    app.config['PORT'] = int(os.getenv('PORT', 5000))
+    app.config['HOST'] = os.getenv('HOST', '0.0.0.0')
+    app.config['FLASK_ENV'] = os.getenv('FLASK_ENV', 'production')
+    
+    # Database URL per deployment cloud
+    app.config['DATABASE_URL'] = os.getenv('DATABASE_URL', config.get('database', {}).get('url', 'sqlite:///./data/app.db'))
     
     # Configurazioni per upload
-    app.config['UPLOAD_FOLDER'] = config.get('file_service', {}).get('upload_folder', './data/uploads')
+    app.config['UPLOAD_FOLDER'] = os.getenv('UPLOAD_FOLDER', config.get('file_service', {}).get('upload_folder', './data/uploads'))
+    
+    # API Keys
+    app.config['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY', config.get('llm', {}).get('api_key'))
+    
+    # Crea directory necessarie
+    os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+    os.makedirs('./data/chroma', exist_ok=True)
+    os.makedirs('./logs', exist_ok=True)
     
     # Salva configurazione completa per accesso globale
     app.config['APP_CONFIG'] = config

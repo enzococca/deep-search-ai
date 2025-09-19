@@ -1,0 +1,53 @@
+# Requirements ottimizzati per deployment cloud
+# Versioni specifiche per stabilità in produzione
+
+# Framework web
+Flask==3.0.0
+flask-cors==4.0.0
+gunicorn==21.2.0
+
+# Database
+SQLAlchemy==2.0.25
+alembic==1.13.1
+
+# AI e Machine Learning
+openai==1.51.2
+tiktoken==0.8.0
+
+# Elaborazione documenti
+PyPDF2==3.0.1
+python-docx==1.1.0
+openpyxl==3.1.2
+python-pptx==0.6.23
+
+# Elaborazione immagini
+Pillow==10.1.0
+pytesseract==0.3.10
+
+# Web scraping
+requests==2.31.0
+beautifulsoup4==4.12.2
+selenium==4.16.0
+
+# Utilities
+pyyaml==6.0.1
+python-dotenv==1.0.0
+click==8.1.7
+
+# Vector database (opzionale)
+chromadb==0.4.18
+
+# Caching (opzionale)
+redis==5.0.1
+
+# Monitoring e logging
+psutil==5.9.6
+
+# Security
+cryptography==41.0.8
+
+# Development tools (commentate per produzione)
+# pytest==7.4.3
+# pytest-flask==1.3.0
+# black==23.11.0
+# flake8==6.1.0
