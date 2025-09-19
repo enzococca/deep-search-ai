@@ -1,0 +1,113 @@
+# Deep Search AI Configuration
+
+# Application Settings
+app:
+  name: "Deep Search AI"
+  version: "1.0.0"
+  debug: true
+  host: "0.0.0.0"
+  port: 5000
+  secret_key: "your-secret-key-change-in-production"
+
+# AI Models Configuration
+ai:
+  # Primary LLM
+  llm:
+    provider: "openai"
+    model: "gpt-4o"  # Will be updated to GPT-5 when available
+    temperature: 0.1
+    max_tokens: 4000
+    
+  # Embedding Models
+  embeddings:
+    text:
+      provider: "openai"
+      model: "text-embedding-3-large"
+      dimensions: 3072
+    multimodal:
+      provider: "openai"
+      model: "clip-vit-large-patch14"
+
+# Vector Database Configuration
+vector_db:
+  provider: "milvus"
+  host: "localhost"
+  port: 19530
+  collections:
+    text: "text_embeddings"
+    images: "image_embeddings"
+    documents: "document_embeddings"
+  
+# Alternative Vector DB (ChromaDB)
+# vector_db:
+#   provider: "chromadb"
+#   persist_directory: "./data/chromadb"
+
+# Database Configuration
+database:
+  url: "sqlite:///./data/app.db"
+  # For PostgreSQL: "postgresql://user:password@localhost/deep_search_ai"
+
+# Redis Configuration
+redis:
+  host: "localhost"
+  port: 6379
+  db: 0
+  password: null
+
+# File Storage
+storage:
+  upload_folder: "./data/uploads"
+  max_file_size: 50  # MB
+  allowed_extensions: ["pdf", "docx", "txt", "jpg", "jpeg", "png", "gif", "bmp"]
+
+# Search Configuration
+search:
+  max_results: 20
+  similarity_threshold: 0.7
+  enable_web_search: true
+  enable_hybrid_search: true
+  
+# Agent Configuration
+agents:
+  text_agent:
+    enabled: true
+    max_tokens: 2000
+  image_agent:
+    enabled: true
+    ocr_enabled: true
+    max_tokens: 2000
+  document_agent:
+    enabled: true
+    chunk_size: 1000
+    chunk_overlap: 200
+  web_agent:
+    enabled: true
+    max_pages: 10
+    timeout: 30
+  synthesis_agent:
+    enabled: true
+    max_tokens: 4000
+
+# API Configuration
+api:
+  rate_limit: "100/hour"
+  enable_cors: true
+  jwt_expiration: 24  # hours
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "./logs/app.log"
+
+# Security
+security:
+  enable_authentication: false  # Set to true in production
+  allowed_origins: ["http://localhost:3000", "http://localhost:5000"]
+  
+# Performance
+performance:
+  cache_ttl: 3600  # seconds
+  async_processing: true
+  max_workers: 4

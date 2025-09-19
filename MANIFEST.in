@@ -1,0 +1,67 @@
+include README.md
+include LICENSE
+include requirements.txt
+include config.yaml
+include run.py
+include setup.py
+include MANIFEST.in
+
+# Documentation
+recursive-include docs *
+recursive-include examples *
+
+# Configuration files
+include *.yaml
+include *.yml
+include *.json
+include *.toml
+
+# Frontend
+recursive-include frontend/dist *
+recursive-include frontend/build *
+include frontend/package.json
+include frontend/package-lock.json
+include frontend/pnpm-lock.yaml
+
+# Tests
+recursive-include tests *
+include pytest.ini
+include .coveragerc
+
+# Scripts
+include scripts/*
+include *.sh
+include *.bat
+
+# Exclude development files
+exclude .env*
+exclude .git*
+exclude *.log
+exclude *.tmp
+exclude *.temp
+exclude .DS_Store
+exclude Thumbs.db
+
+# Exclude data directories
+prune data
+prune logs
+prune uploads
+prune temp
+prune tmp
+
+# Exclude IDE files
+prune .vscode
+prune .idea
+exclude *.swp
+exclude *.swo
+exclude *~
+
+# Exclude Python cache
+global-exclude __pycache__
+global-exclude *.py[cod]
+global-exclude *.so
+
+# Exclude backup files
+global-exclude *.bak
+global-exclude *.backup
+global-exclude *.old
